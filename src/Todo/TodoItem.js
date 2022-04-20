@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import Context from '../context'
+import useInputValue from '../hooks/useInputValue'
 
 const styles = {
   li: {
@@ -10,23 +11,52 @@ const styles = {
     padding: '.5rem 1rem',
     border: '1px solid #ccc',
     borderRadius: '4px',
-    marginBottom: '.5rem'
+    marginBottom: '.5rem',
+    cursor: 'grab'
   },
   input: {
     marginRight: '1rem'
   }
 }
 
-function TodoItem({ todo, index, onChange }) {
-  const { removeTodo } = useContext(Context)
+function TodoItem({
+  todo, 
+  index, 
+  onChange, 
+  dragStartHandler,
+  dragEndHandler,
+  dragLeaveHandler,
+  dragOverHandler,
+  dropHandler 
+}) {
+  const editText = useInputValue('')
+  const { removeTodo, editTodo } = useContext(Context)
   const classes = []
 
   if (todo.completed) {
     classes.push('done')
   }
 
+  const setEditedName = () => {
+    editTodo(editText.bind.value, todo.id)
+    editText.clear()
+  }
+
+  const handleUpdatedDone = (event) => { 
+    if (event.key === "Enter") {
+      editTodo(editText.bind.value, todo.id)
+      editText.clear()
+    }
+  }
+
   return (
-    <li style={styles.li}>
+    <li style={styles.li} 
+    onDragStart={e => dragStartHandler(e, todo)}
+    onDragLeave={e => dragLeaveHandler(e)}
+    onDragEnd={e => dragEndHandler(e)}
+    onDragOver={e => dragOverHandler(e)}
+    onDrop={e => dropHandler(e, todo)}
+    draggable={true}>
       <span className={classes.join(' ')}>
         <input
           type='checkbox'
@@ -36,9 +66,10 @@ function TodoItem({ todo, index, onChange }) {
         />
         <strong>{index + 1}</strong>
         &nbsp;
-        {todo.title}
+        {todo.name}
       </span>
-
+      <input type='text' value={editText.bind.value} onChange={e => editText.bind.onChange(e)} onKeyDown={handleUpdatedDone} />
+      <button onClick={setEditedName}>Edit</button>
       <button className='rm' onClick={removeTodo.bind(null, todo.id)}>
         &times;
       </button>

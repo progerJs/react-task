@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import TodoList from './Todo/TodoList'
 import Context from './context'
 import Loader from './Loader'
@@ -9,27 +9,16 @@ const AddTodo = React.lazy(
     new Promise(resolve => {
       setTimeout(() => {
         resolve(import('./Todo/AddTodo'))
-      }, 3000)
+      }, 2000)
     })
 )
 
 function App() {
   const [todos, setTodos] = React.useState([])
-  const [loading, setLoading] = React.useState(true)
-
-  useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/todos?_limit=5')
-      .then(response => response.json())
-      .then(todos => {
-        setTimeout(() => {
-          setTodos(todos)
-          setLoading(false)
-        }, 2000)
-      })
-  }, [])
+  const [loading] = React.useState(false)
 
   function toggleTodo(id) {
-    setTodos(
+      setTodos(
       todos.map(todo => {
         if (todo.id === id) {
           todo.completed = !todo.completed
@@ -43,11 +32,11 @@ function App() {
     setTodos(todos.filter(todo => todo.id !== id))
   }
 
-  function addTodo(title) {
+  function addTodo(name) {
     setTodos(
       todos.concat([
         {
-          title,
+          name,
           id: Date.now(),
           completed: false
         }
@@ -55,10 +44,20 @@ function App() {
     )
   }
 
+  function editTodo(updatedName, id) {
+    console.log();
+    setTodos(todos.map(todo => {
+      if (todo.id === id) {
+        todo.name = updatedName;
+      }
+      return todo;
+    }))
+  }
+
   return (
-    <Context.Provider value={{ removeTodo }}>
+    <Context.Provider value={{ removeTodo, editTodo }}>
       <div className='wrapper'>
-        <h1>React tutorial</h1>
+        <h1>React task</h1>
         <Modal />
 
         <React.Suspense fallback={<Loader />}>
@@ -67,7 +66,7 @@ function App() {
 
         {loading && <Loader />}
         {todos.length ? (
-          <TodoList todos={todos} onToggle={toggleTodo} />
+          <TodoList todos={todos} setTodos={setTodos} onToggle={toggleTodo}  />
         ) : loading ? null : (
           <p>No todos!</p>
         )}

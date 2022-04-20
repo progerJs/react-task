@@ -1,18 +1,6 @@
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-
-function useInputValue(defaultValue = '') {
-  const [value, setValue] = useState(defaultValue)
-
-  return {
-    bind: {
-      value,
-      onChange: event => setValue(event.target.value)
-    },
-    clear: () => setValue(''),
-    value: () => value
-  }
-}
+import useInputValue from '../hooks/useInputValue'
 
 function AddTodo({ onCreate }) {
   const input = useInputValue('')
