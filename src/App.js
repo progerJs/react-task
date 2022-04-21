@@ -1,78 +1,83 @@
-import React from 'react'
-import TodoList from './Todo/TodoList'
-import Context from './context'
-import Loader from './Loader'
-import Modal from './Modal/Modal'
+import React, { Fragment, useState } from "react";
+import AddTodoForm from "./components/AddTodoForm";
+import List from "./components/List";
+import { Paper, Grid } from "@material-ui/core";
 
-const AddTodo = React.lazy(
-  () =>
-    new Promise(resolve => {
-      setTimeout(() => {
-        resolve(import('./Todo/AddTodo'))
-      }, 2000)
-    })
-)
-
-function App() {
-  const [todos, setTodos] = React.useState([])
-  const [loading] = React.useState(false)
-
-  function toggleTodo(id) {
-      setTodos(
-      todos.map(todo => {
-        if (todo.id === id) {
-          todo.completed = !todo.completed
-        }
-        return todo
-      })
-    )
+const styles = {
+  Paper: {
+    padding: 20,
+    margin: "auto",
+    textAlign: "center",
+    width: 500
   }
+};
 
-  function removeTodo(id) {
-    setTodos(todos.filter(todo => todo.id !== id))
-  }
+const App = () => {
+  const [list, setList] = useState([]);
+  const re = /^[A-Za-z0-9\b]+$/;
+  const addToList = (e, name) => {
+    e.preventDefault();
+    if (name === '' || re.test(name)) { 
+      const li = [ ...list, {
+        id: Date.now(),
+        name,
+        status: "active"
+      } ];
+      
+      setList(li)
+    }else {
+      alert('Only Latin and numbers are allowed');
+    }
+    
+  };
 
-  function addTodo(name) {
-    setTodos(
-      todos.concat([
-        {
-          name,
-          id: Date.now(),
-          completed: false
-        }
-      ])
-    )
-  }
+  const deleteTodo = id => {
+    setList(list.filter(todo => todo.id !== id));
+  };
 
-  function editTodo(updatedName, id) {
-    console.log();
-    setTodos(todos.map(todo => {
+  const updateTodo = (id) => {
+    setList(list.map(todo => {
       if (todo.id === id) {
-        todo.name = updatedName;
+        todo.status = "editing";
       }
       return todo;
     }))
-  }
+  };
 
+  const saveTodo = (e, id, name) => {
+    e.preventDefault();
+    if (name === '' || re.test(name)) { 
+      setList(list.map(todo => {
+        if(todo.id === id) {
+          todo.name = name;
+          todo.status = 'active';
+        }
+        return todo;
+      }))
+    }else {
+      alert('Only Latin and numbers are allowed');
+    }
+  };
   return (
-    <Context.Provider value={{ removeTodo, editTodo }}>
-      <div className='wrapper'>
-        <h1>React task</h1>
-        <Modal />
-
-        <React.Suspense fallback={<Loader />}>
-          <AddTodo onCreate={addTodo} />
-        </React.Suspense>
-
-        {loading && <Loader />}
-        {todos.length ? (
-          <TodoList todos={todos} setTodos={setTodos} onToggle={toggleTodo}  />
-        ) : loading ? null : (
-          <p>No todos!</p>
-        )}
-      </div>
-    </Context.Provider>
-  )
+    <Fragment>
+      <Grid container spacing={0}>
+        <Grid item xs={12}>
+          <Paper style={styles.Paper}>
+            <AddTodoForm addToList={addToList} />
+          </Paper>
+        </Grid>
+        <Grid item xs={12} style={styles.Paper}>
+          <List
+            deleteTodo={deleteTodo}
+            list={list}
+            updateTodo={updateTodo}
+            saveTodo={saveTodo}
+            setList={setList}
+          />
+        </Grid>
+      </Grid>
+    </Fragment>
+  );
 }
 
-export default App
+export default App;
