@@ -50,13 +50,15 @@ function TodoItem({
   }
 
   return (
-    <li style={styles.li} 
-    onDragStart={e => dragStartHandler(e, todo)}
-    onDragLeave={e => dragLeaveHandler(e)}
-    onDragEnd={e => dragEndHandler(e)}
-    onDragOver={e => dragOverHandler(e)}
-    onDrop={e => dropHandler(e, todo)}
-    draggable={true}>
+    <li 
+      style={styles.li} 
+      onDragStart={e => dragStartHandler(e, todo)}
+      onDragLeave={e => dragLeaveHandler(e)}
+      onDragEnd={e => dragEndHandler(e)}
+      onDragOver={e => dragOverHandler(e)}
+      onDrop={e => dropHandler(e, todo)}
+      draggable={true}
+    >
       <span className={classes.join(' ')}>
         <input
           type='checkbox'
