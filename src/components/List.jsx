@@ -42,12 +42,12 @@ const List = (props) => {
     }
 
     const renderTodo = (todo) => {
+        let renderTodo;
         if (!props.list.length) {
-          return null;
+          renderTodo = null;
         }
-        if (todo.status === "active") {
-            return (
-            <Todo
+        if (todo.status === "active") {           
+          renderTodo = <Todo
                 key={todo.id}
                 index={todo.id}
                 todo={todo}
@@ -59,17 +59,19 @@ const List = (props) => {
                 dragOverHandler={dragOverHandler}
                 dropHandler={dropHandler}
             />
-            );
         } else if (todo.status === "editing") {
-            return (
-            <EditTodo
+          renderTodo = <EditTodo
                 key={todo.id}
                 index={todo.id}
                 todo={todo}
                 saveTodo={props.saveTodo}
             />
-            );
         }
+        return (
+          <>
+            {renderTodo}
+          </>
+        );
     };
     
     return (

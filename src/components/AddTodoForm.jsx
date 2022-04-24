@@ -21,7 +21,7 @@ const AddTodoForm = (props) => {
     return (
         <form onSubmit={handleSubmit} style={{ display: "flex" }}>
             <Input
-            placeholder="Todo"
+            placeholder="List name"
             inputProps={{
                 "aria-label": "Description"
             }}
